@@ -2,10 +2,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.TreeSet;
-
 import static org.junit.Assert.*;
 
 public class Graph_ {
@@ -59,16 +55,56 @@ public class Graph_ {
         Graph graph = new Graph(3);
         assertTrue(graph.addEdge(0, 1));
         assertFalse(graph.addEdge(0, 1));
-        assertFalse(graph.addEdge(0, 1));
-        assertEquals(graph.amountOfEdges(), 1);
+        assertEquals(1, graph.amountOfEdges());
     }
 
 
     @Test
     public void should_not_add_edges_if_a_vertex_not_exists() throws Exception {
         exception.expect(IndexOutOfBoundsException.class);
-        exception.expectMessage("vertex(10): is out of range {0..6}");
+        exception.expectMessage("vertex(10): is not inside the graph");
         new Graph(7).addEdge(0, 10);
+    }
+
+    @Test
+    public void should_remove_a_vertex_with_its_edges() throws Exception {
+        int size = 3;
+        Graph graph = setupGraph(size);
+        assertEquals(size, graph.amountOfVertex());
+        assertEquals(6, graph.amountOfEdges());
+        assertTrue(graph.removeVertex(0));
+        assertEquals(size - 1, graph.amountOfVertex());
+        assertEquals(3, graph.amountOfEdges());
+    }
+
+    @Test
+    public void should_not_remove_a_vertex_if_not_exists() throws Exception {
+        int size = 3;
+        Graph graph = setupGraph(size);
+        assertEquals(size, graph.amountOfVertex());
+        assertEquals(6, graph.amountOfEdges());
+        assertFalse(graph.removeVertex(9));
+        assertEquals(size, graph.amountOfVertex());
+        assertEquals(6, graph.amountOfEdges());
+    }
+
+    private Graph setupGraph(int size) {
+        Graph graph = new Graph(size);
+        graph.addEdge(0, 0);
+        graph.addEdge(0, 1);
+        graph.addEdge(0, 2);
+        graph.addEdge(1, 2);
+        graph.addEdge(1, 1);
+        graph.addEdge(2, 2);
+        return graph;
+    }
+
+    @Test
+    public void should_build_a_copy_by_constructor() throws Exception {
+        Graph graph1 = setupGraph(3);
+        Graph graph2 = new Graph(graph1);
+        assertFalse(graph1 == graph2);
+        assertEquals(graph1, graph2);
     }
 
     @Test
@@ -80,21 +116,6 @@ public class Graph_ {
         graph.addEdge(0, 2);
         graph.addEdge(1, 2);
         assertEquals("Graph { 3 vertices; 4 edges }", graph.toString());
-    }
-
-    private Edge edge(int vertex1, int vertex2, double weight) {
-        return new Edge(vertex1, vertex2);
-    }
-
-    private List<Edge> expectedList(Edge... edges) {
-        return Arrays.asList(edges);
-    }
-
-    private TreeSet<Edge> expectedTree(Edge... edges) {
-        TreeSet<Edge> s = new TreeSet<>();
-        for (Edge e : edges)
-            s.add(e);
-        return s;
     }
 
 }

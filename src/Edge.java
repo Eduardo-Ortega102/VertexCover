@@ -23,6 +23,12 @@ public class Edge implements Comparable<Edge> {
         return highVertex;
     }
 
+    public int otherVertex(int vertex) {
+        if (vertex == lowVertex) return highVertex;
+        if (vertex == highVertex) return lowVertex;
+        throw new IllegalArgumentException("vertex(" + vertex + "): This vertex is not inside the edge");
+    }
+
     public boolean isLoop() {
         return lowVertex == highVertex;
     }
@@ -43,8 +49,13 @@ public class Edge implements Comparable<Edge> {
         return compare(lowVertex, edge.lowVertex) != 0 ? compare(lowVertex, edge.lowVertex) : compare(highVertex, edge.highVertex);
     }
 
-    public boolean containsVertexOf(Edge target) {
-        //TODO
-        return false;
+    @Override
+    public int hashCode() {
+        return 31 * lowVertex + highVertex;
+    }
+
+    public boolean containsAnyVertexOf(Edge target) {
+        return lowVertex == target.lowVertex  || lowVertex == target.highVertex ||
+               highVertex == target.lowVertex || highVertex == target.highVertex;
     }
 }
