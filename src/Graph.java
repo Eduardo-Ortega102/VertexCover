@@ -60,7 +60,7 @@ public class Graph implements Iterable<Edge>{
     }
 
     public boolean removeVertex(int target) {
-        if (!vertices.containsKey(target)) return false;
+        if (!containsVertex(target)) return false;
         Set<Integer> relatedVertices = vertices.remove(target);
         for (int vertex : relatedVertices)
             if (vertex != target) vertices.get(vertex).remove(target);
