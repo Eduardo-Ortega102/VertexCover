@@ -56,4 +56,9 @@ public class VertexCover_ {
         }
 
     }
+
+    @Test
+    public void test_graph1() throws Exception {
+
+    }
 }

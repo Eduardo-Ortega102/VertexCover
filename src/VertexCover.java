@@ -22,9 +22,6 @@ public class VertexCover {
 
             copy.removeVertex(e.lowVertex());
             copy.removeVertex(e.highVertex());
-
-            System.out.println(copy);
-
         }
 
         return cover;
