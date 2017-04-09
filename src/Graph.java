@@ -1,71 +1,201 @@
-
 import java.util.*;
 
-public class Graph implements Iterable<Edge>{
-    private int amountOfEdges;
-    private Map<Integer, Set<Integer>> vertices;
+public class Graph {
 
+    final protected Map<Integer, Set<Integer>> adjacencyList;
+    protected int amountOfEdges;
+
+    /**
+     * Initialize an empty graph
+     */
+    public Graph() {
+        this.adjacencyList = new HashMap<>();
+        this.amountOfEdges = 0;
+    }
+
+    /**
+     * Creates a random connected graph of a given number of vertices and edges
+     * @param vertices The number of vertices
+     * @param edges The number of edges to be randomly created.
+     * @param r The random object to be used
+     */
+    public Graph(int vertices, int edges, Random r) {
+        this(vertices);
+
+        for (int vertex = 1; vertex < vertices; vertex++) {
+            addEdge(vertex, r.nextInt(vertex));
+        }
+
+        for (int vertex = vertices; vertex < edges; vertex++) {
+            addEdge(r.nextInt(vertices), r.nextInt(vertices));
+        }
+    }
+
+
+    /**
+     * Initialize a graph with vertices from 1 to size
+     * @param size The number of initial vertices
+     */
     public Graph(int size) {
-        if (size < 0)
-            throw new IllegalArgumentException("size(" + size + "): the size of a graph must be greater or equal than 0");
-        amountOfEdges = 0;
-        vertices = new HashMap<>(size);
-        for (int vertex = 0; vertex < size; vertex++)
-            vertices.put(vertex, new HashSet<>());
+        this();
+
+        if (size < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        for (int i = 0; i < size; i++) {
+            addVertex(i);
+        }
     }
 
-    public Graph(Graph graph) {
-        this(graph.amountOfVertex());
-        for (Integer vertex : vertices.keySet())
-            vertices.get(vertex).addAll(graph.vertices.get(vertex));
-        amountOfEdges = graph.amountOfEdges;
+    /**
+     * Construct a graph which is a copy of the given graph
+     * @param g The graph to be copied
+     */
+    public Graph(Graph g) {
+        this();
+
+        for (int v : g.getAllVertices()) {
+            this.addVertex(v);
+        }
+
+        //TODO: make more efficient
+        for (int v : g.getAllVertices()) {
+            for (int u : g.getNeighbors(v)) {
+                addEdge(v, u);
+            }
+        }
     }
 
-    public boolean addEdge(int vertex1, int vertex2) {
-        checkBounds(vertex1);
-        checkBounds(vertex2);
-        if (vertices.get(vertex1).contains(vertex2)) return false;
-        vertices.get(vertex1).add(vertex2);
-        vertices.get(vertex2).add(vertex1);
+    /**
+     * Add new vertex to the graph.
+     *
+     * @param v The vertex object.
+     */
+    public boolean addVertex(int v) {
+        if (this.adjacencyList.containsKey(v)) {
+            //Or throw exception??
+            return false;
+        }
+
+        this.adjacencyList.put(v, new HashSet<>());
+        return true;
+    }
+
+    /**
+     * Add new edge between vertex. Adding new edge from u to v will
+     * automatically add new edge from v to u since the graph is undirected.
+     *
+     * @param v Start vertex.
+     * @param u Destination vertex.
+     */
+    public boolean addEdge(int v, int u) {
+        checkVertex(v);
+        checkVertex(u);
+
+        if (isAdjacent(v, u)) return false;
+
+        this.adjacencyList.get(v).add(u);
+        this.adjacencyList.get(u).add(v);
         amountOfEdges++;
         return true;
     }
 
-    public int amountOfVertex() {
-        return vertices.size();
+
+    /**
+     * Remove the edge between vertex. Removing the edge from u to v will
+     * automatically remove the edge from v to u since the graph is undirected.
+     *
+     * @param v Start vertex.
+     * @param u Destination vertex.
+    public boolean removeEdge(int v, int u) {
+
+        this.adjacencyList.get(v).remove(u);
+
+        try {
+            this.adjacencyList.get(u).remove(v);
+        } catch (NullPointerException e) {
+            //This happens on self loops
+            //Ignore
+        }
+
+        amountOfEdges--;
+        return true;
+    }
+                */
+
+    /**
+     * Check adjacency between 2 vertices in the graph.
+     *
+     * @param v Start vertex.
+     * @param u Destination vertex.
+     * @return <tt>true</tt> if the vertex v and u are connected.
+     */
+    public boolean isAdjacent(int v, int u) {
+        return this.adjacencyList.get(v).contains(u);
     }
 
-    public int amountOfEdges() {
+    /**
+     * Get connected vertices of a vertex.
+     *
+     * @param v The vertex.
+     * @return An iterable for connected vertices.
+     */
+    public Iterable<Integer> getNeighbors(int v) {
+        return this.adjacencyList.get(v);
+    }
+
+    /**
+     * Get the number of connected vertices of a vertex
+     *
+     * @param v The vertex.
+     * @return The number of adjacent vertices.
+     */
+    public int getDegree(int v) {
+        checkVertex(v);
+        return this.adjacencyList.get(v).size();
+    }
+
+    /**
+     * Get all vertices in the graph.
+     *
+     * @return An Iterable for all vertices in the graph.
+     */
+    public Iterable<Integer> getAllVertices() {
+        return this.adjacencyList.keySet();
+    }
+
+    /**
+     * Check if the graph is empty.
+     * @return true if the graph doesn't contain any vertex.
+     */
+    public boolean isEmpty() {
+        return this.adjacencyList.keySet().isEmpty();
+    }
+
+    /**
+     * Return the number of vertices in the graph.
+     * @return the size of the graph
+     */
+    public int size() {
+        return this.adjacencyList.keySet().size();
+    }
+
+    /**
+     * Return the number of amountOfEdges in the graph.
+     * @return the amountOfEdges in the the graph
+     */
+    public int edges() {
         return amountOfEdges;
     }
 
-    private void checkBounds(int vertex) {
-        if (isEmpty())
-            throw new IndexOutOfBoundsException("vertex(" + vertex + "): is out of range {-}");
-        if (!containsVertex(vertex))
-            throw new IndexOutOfBoundsException("vertex(" + vertex + "): is not inside the graph");
-    }
-
-    public boolean containsVertex(int vertex) {
-        return vertices.containsKey(vertex);
-    }
-
-    public boolean isEmpty() {
-        return amountOfVertex() == 0;
-    }
-
-    @Override
-    public String toString() {
-        return "Graph { " + amountOfVertex() + " vertices; " + amountOfEdges() + " edges }";
-    }
-
-    public boolean removeVertex(int target) {
-        if (!containsVertex(target)) return false;
-        Set<Integer> relatedVertices = vertices.remove(target);
-        for (int vertex : relatedVertices)
-            if (vertex != target) vertices.get(vertex).remove(target);
-        amountOfEdges -= relatedVertices.size();
-        return true;
+    /**
+     * Check if given vertex is contained in the graph
+     * @param v The vertex
+     * @return true if the vertex is contained in the graph
+     */
+    public boolean containsVertex(int v) {
+        return this.adjacencyList.containsKey(v);
     }
 
     @Override
@@ -73,28 +203,30 @@ public class Graph implements Iterable<Edge>{
         if (this == other) return true;
         if (other == null || getClass() != other.getClass()) return false;
         Graph graph = (Graph) other;
-        if (amountOfEdges != graph.amountOfEdges) return false;
-        return vertices.equals(graph.vertices);
+        if (amountOfEdges != graph.edges()) return false;
+        return adjacencyList.equals(graph.adjacencyList);
     }
 
-
     @Override
-    public Iterator<Edge> iterator() {
-        return new Iterator<Edge>() {
-            private final Random random = new Random();
+    public String toString() {
+        return "Graph { " + size() + " vertices; " + edges() + " amountOfEdges }";
+    }
 
-            @Override
-            public boolean hasNext() {
-                return amountOfEdges > 0;
-            }
+    public String fullString() {
+        String s = toString();
 
-            @Override
-            public Edge next() {
-                List<Integer> keys = new ArrayList<>(vertices.keySet());
-                int origin = keys.get(random.nextInt(keys.size()));
-                Set<Integer> destinations = vertices.get(origin);
-                return new Edge(origin, destinations.iterator().next());
+        for (int v : getAllVertices()) {
+            s += System.lineSeparator() + v + " :";
+            for (int u : getNeighbors(v)) {
+                s += " " + u;
             }
-        };
+        }
+
+        return s;
+    }
+
+    private void checkVertex(int v) {
+        if (!containsVertex(v))
+            throw new IndexOutOfBoundsException();
     }
 }

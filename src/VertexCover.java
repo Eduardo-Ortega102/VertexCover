@@ -2,16 +2,51 @@ import java.util.*;
 
 public class VertexCover {
 
-    public List<Integer> cover(Graph graph) {
-        List<Integer> vertices = new ArrayList<>();
-        Graph copy = new Graph(graph);
-        for (Edge edge : copy) {
-            vertices.add(edge.lowVertex());
-            vertices.add(edge.highVertex());
-            copy.removeVertex(edge.lowVertex());
-            copy.removeVertex(edge.highVertex());
+    /**
+     * Find an approximated vertex cover for a given graph
+     * @param g The graph
+     * @return  A collection of vertex representing the cover set.
+     */
+    public static Collection<Integer> cover(Graph g) {
+        Collection<Integer> cover = new TreeSet<>();
+        EdgeGraph copy = new EdgeGraph(g);
+
+        while (copy.edges() > 0) {
+
+            Edge e;
+
+            e = copy.randomEdge();
+
+            cover.add(e.lowVertex());
+            cover.add(e.highVertex());
+
+            copy.removeVertex(e.lowVertex());
+            copy.removeVertex(e.highVertex());
         }
-        return vertices;
+
+        return cover;
     }
 
+    /**
+     * Check if the provided cover is a valid cover for the graph
+     * @param g     The graph
+     * @param cover The collection of vertices in the cover
+     * @return True if every edge of g has at least on vertex in cover
+     */
+    public static boolean isValidCover(Graph g, Collection<Integer> cover) {
+
+        mainLoop:
+        for (int v : g.getAllVertices()) {
+
+            if (cover.contains(v)) continue;
+
+            for (int neighbor : g.getNeighbors(v)) {
+                if (cover.contains(neighbor))
+                    continue mainLoop;
+            }
+            return false;
+        }
+
+        return true;
+    }
 }
