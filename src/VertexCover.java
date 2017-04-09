@@ -11,13 +11,20 @@ public class VertexCover {
         Collection<Integer> cover = new TreeSet<>();
         EdgeGraph copy = new EdgeGraph(g);
 
-        for (Edge e : copy) {
+        while (copy.edges() > 0) {
+
+            Edge e;
+
+            e = copy.randomEdge();
 
             cover.add(e.lowVertex());
             cover.add(e.highVertex());
 
             copy.removeVertex(e.lowVertex());
             copy.removeVertex(e.highVertex());
+
+            System.out.println(copy);
+
         }
 
         return cover;

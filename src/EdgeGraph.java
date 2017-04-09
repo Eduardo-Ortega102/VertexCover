@@ -6,7 +6,7 @@ import java.util.*;
  */
 public class EdgeGraph extends Graph implements Iterable<Edge> {
 
-    private SortedSet<Edge> edges = new TreeSet<>();
+    private Set<Edge> edges = new HashSet<>();
 
     /**
      * Construct an EdgeGraph which is a copy of a Graph
@@ -65,6 +65,16 @@ public class EdgeGraph extends Graph implements Iterable<Edge> {
 
         assert amountOfEdges == edges.size();
         return true;
+    }
+
+    public Edge randomEdge() {
+        int r = new Random().nextInt(edges.size());
+        Iterator<Edge> it = edges.iterator();
+        for (int i = 0; i < r; i++) {
+            it.next();
+        }
+
+        return it.next();
     }
 
     /**

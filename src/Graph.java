@@ -212,6 +212,19 @@ public class Graph {
         return "Graph { " + size() + " vertices; " + edges() + " amountOfEdges }";
     }
 
+    public String fullString() {
+        String s = toString();
+
+        for (int v : getAllVertices()) {
+            s += System.lineSeparator() + v + " :";
+            for (int u : getNeighbors(v)) {
+                s += " " + u;
+            }
+        }
+
+        return s;
+    }
+
     private void checkVertex(int v) {
         if (!containsVertex(v))
             throw new IndexOutOfBoundsException();
